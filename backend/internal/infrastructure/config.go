@@ -16,7 +16,7 @@ func LoadConfig() *Config {
 	_ = godotenv.Load()
 	return &Config{
 		AppEnv:   getEnv("APP_ENV", "dev"),
-		HTTPPort: getEnv("HTTP_PORT", "18080"),
+		HTTPPort: getEnv("HTTP_PORT", "8083"),
 	}
 }
 
