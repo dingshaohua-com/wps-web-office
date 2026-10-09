@@ -13,6 +13,10 @@ export default defineConfig(({ mode }) => {
       },
     },
     plugins: [react(), babel({ presets: [reactCompilerPreset()] }), tailwindcss()],
+    build: {
+      outDir: '../backend/internal/webui/dist',
+      emptyOutDir: true,
+    },
     server: {
       proxy: {
         '/api': {
