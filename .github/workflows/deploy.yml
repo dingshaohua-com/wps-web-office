@@ -1,0 +1,121 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DEPLOY_DIR: /home/apps
+  APP_NAME: wps-web-office
+  APP_PORT: 8080
+  REMOTE_HOST: ${{ secrets.REMOTE_HOST }}
+  REMOTE_PORT: ${{ secrets.REMOTE_PORT || 22 }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 配置 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 配置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: 配置 Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: 配置 Task
+        uses: go-task/setup-task@v1
+        with:
+          version: '3.49.1'
+
+      - name: 安装依赖
+        run: task install
+
+      - name: 构建应用
+        env:
+          CGO_ENABLED: 0
+          GOOS: linux
+          GOARCH: amd64
+          VITE_API_BASE_URL: /api
+        run: task build
+
+      - name: 准备部署产物
+        run: |
+          mkdir -p release
+          cp "dist/$APP_NAME" "release/$APP_NAME"
+          test -s backend/.env
+          cp backend/.env release/.env
+          tar -czf release.tar.gz -C release .
+
+      - name: 上传部署产物
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ env.REMOTE_HOST }}
+          port: ${{ env.REMOTE_PORT }}
+          username: root
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          source: release.tar.gz
+          target: /tmp
+
+      - name: 部署并重启
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ env.REMOTE_HOST }}
+          port: ${{ env.REMOTE_PORT }}
+          username: root
+          key: ${{ env.SSH_PRIVATE_KEY }}
+          envs: DEPLOY_DIR,APP_NAME,APP_PORT
+          script: |
+            set -e
+            APP_DIR="$DEPLOY_DIR/$APP_NAME"
+            mkdir -p "$APP_DIR/.incoming"
+            tar -xzf /tmp/release.tar.gz -C "$APP_DIR/.incoming"
+            test -s "$APP_DIR/.incoming/.env"
+            chmod 600 "$APP_DIR/.incoming/.env"
+            mv -f "$APP_DIR/.incoming/.env" "$APP_DIR/.env"
+            chmod +x "$APP_DIR/.incoming/$APP_NAME"
+            mv -f "$APP_DIR/.incoming/$APP_NAME" "$APP_DIR/$APP_NAME"
+            rm -f /tmp/release.tar.gz
+            cd "$APP_DIR"
+            chmod +x "$APP_NAME"
+
+            # 杀掉旧进程，重新启动
+            lsof -t -i:"$APP_PORT" | xargs -r kill -9 || true
+            sleep 1
+            HTTP_PORT="$APP_PORT" nohup ./"$APP_NAME" > app.log 2>&1 &
+            app_pid=$!
+
+            for attempt in $(seq 1 15); do
+              if ! kill -0 "$app_pid" 2>/dev/null; then
+                tail -n 30 app.log
+                exit 1
+              fi
+              if curl --fail --silent --max-time 2 "http://127.0.0.1:$APP_PORT/openapi.json" > /dev/null; then
+                echo "Deploy succeeded"
+                exit 0
+              fi
+              sleep 1
+            done
+            tail -n 30 app.log
+            exit 1
