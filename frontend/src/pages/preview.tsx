@@ -23,6 +23,7 @@ export default function Preview() {
       appId: APP_ID,
       fileId,
       mount: containerRef.current,
+      mode: 'simple',
     });
 
     instance.on('error', (event: unknown) => {
