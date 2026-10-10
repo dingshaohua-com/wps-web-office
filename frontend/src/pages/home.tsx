@@ -22,24 +22,19 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const loadFiles = async () => {
+    try {
+      const response = await axiosInstance.get<ApiResponse<FileItem[]>>('/test-office');
+      setFiles(response.data.data)
+    } catch {
+      setError('文件列表加载失败')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
-    const controller = new AbortController();
-
-    const loadFiles = async () => {
-      try {
-        const response = await axiosInstance.get<ApiResponse<FileItem[]>>('/test-office', {
-          signal: controller.signal,
-        });
-        setFiles(response.data.data);
-      } catch {
-        if (!controller.signal.aborted) setError('文件列表加载失败');
-      } finally {
-        if (!controller.signal.aborted) setLoading(false);
-      }
-    };
-
-    void loadFiles();
-    return () => controller.abort();
+    loadFiles()
   }, []);
 
   return (
