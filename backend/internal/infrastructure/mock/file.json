@@ -1,9 +1,9 @@
 {
   "jl_docx": {
-    "id": "jl.docx",
+    "id": "jl_docx",
     "name": "简历.docx",
     "size": 118221,
-    "url": "http://localhost:8083/static/jl.docx",
+    "url": "/static/jl.docx",
     "version": 1,
     "create_time": 1791532236,
     "modify_time": 1791532236,
@@ -12,10 +12,10 @@
   },
 
   "gzs_pdf": {
-    "id": "gzs.pdf",
+    "id": "gzs_pdf",
     "name": "告知书.pdf",
     "size": 182272,
-    "url": "http://localhost:8083/static/gzs.pdf",
+    "url": "/static/gzs.pdf",
     "version": 1,
     "create_time": 1891532236,
     "modify_time": 1891532236,

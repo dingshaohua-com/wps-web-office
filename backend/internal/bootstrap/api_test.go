@@ -28,6 +28,7 @@ func TestFileDownloadUsesMockFileURL(t *testing.T) {
 	RegisterAPI(router)
 
 	request := httptest.NewRequest(http.MethodGet, "/office/v3/3rd/files/jl_docx/download", nil)
+	request.Host = "office.example.com:9443"
 	response := httptest.NewRecorder()
 	router.ServeHTTP(response, request)
 
@@ -45,7 +46,7 @@ func TestFileDownloadUsesMockFileURL(t *testing.T) {
 		t.Fatalf("json.Unmarshal() error = %v", err)
 	}
 
-	want := "http://localhost:8083/static/jl.docx"
+	want := "http://office.example.com:9443/static/jl.docx"
 	if body.Code != 0 {
 		t.Errorf("body.Code = %d, want 0", body.Code)
 	}
