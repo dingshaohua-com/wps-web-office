@@ -27,7 +27,7 @@ export default function Home() {
 
     const loadFiles = async () => {
       try {
-        const response = await axiosInstance.get<ApiResponse<FileItem[]>>('/test-office/', {
+        const response = await axiosInstance.get<ApiResponse<FileItem[]>>('/test-office', {
           signal: controller.signal,
         });
         setFiles(response.data.data);

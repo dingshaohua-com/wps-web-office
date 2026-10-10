@@ -1,4 +1,5 @@
 import WebOfficeSDK from '@/utils/web-office-sdk-solution-v2.0.7/web-office-sdk-solution-v2.0.7.es.js';
+import { ArrowLeft } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
 
@@ -41,8 +42,13 @@ export default function Preview() {
   return (
     <main className="flex min-h-screen flex-col bg-slate-100">
       <header className="flex h-14 items-center gap-4 border-b border-slate-200 bg-white px-5">
-        <Link className="text-sm text-slate-500 hover:text-slate-900" to="/">
-          返回列表
+        <Link
+          aria-label="返回文件列表"
+          className="rounded-md p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+          title="返回文件列表"
+          to="/"
+        >
+          <ArrowLeft aria-hidden="true" size={20} />
         </Link>
         <h1 className="truncate font-medium text-slate-900">{fileName}</h1>
       </header>

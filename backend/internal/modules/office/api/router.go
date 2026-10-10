@@ -20,5 +20,5 @@ func RegisterRoutes(handler *OfficeHandler, api huma.API) {
 	huma.Get(officeGroup, "/{file_id}/permission", handler.FilePermission, operation("file_permission", "文件权限"))
 
 	testOfficeGroup := sharedApi.NewGroup(api, "/test-office", "test-office")
-	huma.Get(testOfficeGroup, "/", handler.TestFileList, operation("test_file_list", "测试文件列表"))
+	huma.Get(testOfficeGroup, "", handler.TestFileList, operation("test_file_list", "测试文件列表"))
 }

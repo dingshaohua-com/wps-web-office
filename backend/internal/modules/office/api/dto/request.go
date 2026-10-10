@@ -1,25 +1,22 @@
 package dto
 
-type GetFeedRequest struct {
-	ID int `path:"id" minimum:"1" doc:"说说 ID"`
+import (
+	"backend/internal/shared/network"
+
+	"github.com/danielgtaylor/huma/v2"
+)
+
+type FilePathInput struct {
+	FileID string `path:"file_id"`
 }
 
-// CreateFeedRequest 对应 POST /office 的 JSON 请求体。
-type CreateFeedRequest struct {
-	Body struct {
-		Content string `json:"content" minLength:"1" maxLength:"100" doc:"说说内容"`
-	}
+type FileDownloadInput struct {
+	FileID        string `path:"file_id"`
+	RequestOrigin network.RequestOrigin
 }
 
-// UpdateFeedRequest 对应 PUT /office/{id}。
-type UpdateFeedRequest struct {
-	ID   int `path:"id" minimum:"1" doc:"文章 ID"`
-	Body struct {
-		Content string `json:"content" minLength:"1" maxLength:"100" doc:"文章内容"`
-	}
-}
-
-// DeleteFeedRequest 对应 DELETE /office/{id}。
-type DeleteFeedRequest struct {
-	ID int `path:"id" minimum:"1" doc:"文章 ID"`
+// Resolve 是 Huma 的请求参数解析钩子，方法名由 huma.Resolver 接口规定。
+func (input *FileDownloadInput) Resolve(ctx huma.Context) []error {
+	input.RequestOrigin = network.NewRequestOrigin(ctx)
+	return nil
 }

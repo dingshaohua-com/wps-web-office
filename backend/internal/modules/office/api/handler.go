@@ -2,6 +2,7 @@ package api
 
 import (
 	"backend/internal/infrastructure/mock"
+	"backend/internal/modules/office/api/dto"
 	"backend/internal/modules/office/application"
 	sharedApi "backend/internal/shared/api"
 	"context"
@@ -16,7 +17,7 @@ func NewOfficeHandler(service *application.QueryOfficeService) *OfficeHandler {
 	return &OfficeHandler{service: service}
 }
 
-func (h *OfficeHandler) FileInfo(_ context.Context, input *FilePathInput) (*sharedApi.Body2[mock.File], error) {
+func (h *OfficeHandler) FileInfo(_ context.Context, input *dto.FilePathInput) (*sharedApi.Body2[mock.File], error) {
 	file, exists, err := mock.GetFile(input.FileID)
 	if err != nil {
 		return nil, err
@@ -27,7 +28,7 @@ func (h *OfficeHandler) FileInfo(_ context.Context, input *FilePathInput) (*shar
 	return sharedApi.NewBody2(file), nil
 }
 
-func (h *OfficeHandler) FileDownload(_ context.Context, input *FileDownloadInput) (*sharedApi.Body2[map[string]string], error) {
+func (h *OfficeHandler) FileDownload(_ context.Context, input *dto.FileDownloadInput) (*sharedApi.Body2[map[string]string], error) {
 	file, exists, err := mock.GetFile(input.FileID)
 	if err != nil {
 		return nil, err
@@ -40,7 +41,7 @@ func (h *OfficeHandler) FileDownload(_ context.Context, input *FileDownloadInput
 	}), nil
 }
 
-func (h *OfficeHandler) FilePermission(_ context.Context, _ *FilePathInput) (*sharedApi.Body2[map[string]any], error) {
+func (h *OfficeHandler) FilePermission(_ context.Context, _ *dto.FilePathInput) (*sharedApi.Body2[map[string]any], error) {
 	info := map[string]any{
 		"read":     1,
 		"update":   0,
