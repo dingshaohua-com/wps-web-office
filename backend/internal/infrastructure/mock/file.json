@@ -1,0 +1,25 @@
+{
+  "jl_docx": {
+    "id": "jl.docx",
+    "name": "简历.docx",
+    "size": 118221,
+    "url": "http://localhost:8083/static/jl.docx",
+    "version": 1,
+    "create_time": 1791532236,
+    "modify_time": 1791532236,
+    "creator_id": "system",
+    "modifier_id": "system"
+  },
+
+  "gzs_pdf": {
+    "id": "gzs.pdf",
+    "name": "告知书.pdf",
+    "size": 182272,
+    "url": "http://localhost:8083/static/gzs.pdf",
+    "version": 1,
+    "create_time": 1891532236,
+    "modify_time": 1891532236,
+    "creator_id": "system",
+    "modifier_id": "system"
+  }
+}

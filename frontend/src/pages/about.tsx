@@ -4,17 +4,6 @@ import { useEffect, useRef } from 'react';
 
 // const fileUrl = 'https://dsh-1300009960.cos.ap-beijing.myqcloud.com/office/jl.docx'
 
-// const instance = WebOfficeSDK.init({
-//   officeType: WebOfficeSDK.OfficeType.Writer,
-//   appId: 'SX20260914ZIHJLM',
-//   // fileId: 'HyIKDNdzqFvYFCsmkfQOXAGVSDOCvMTk'
-//   fileId:'jl_docx',
-//   mount: document.querySelector('#wps-container')
-// });
-
-// console.log(instance);
-
-
 
 function About() {
 
@@ -24,7 +13,7 @@ function About() {
 
     const instance = WebOfficeSDK.init({
       officeType: WebOfficeSDK.OfficeType.Writer,
-      appId: 'SX20260914ZIHJLM',
+      appId: 'SX20261009BIXNZA',
       fileId: 'jl_docx',
       mount: containerRef.current
     })
@@ -43,7 +32,10 @@ function About() {
   }, [])
 
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100vh' }}></div>
+    <div className='flex justify-center items-center h-full'>
+      <div ref={containerRef} className='w-1/2 h-4/5'></div>
+    </div>
+
   )
 }
 

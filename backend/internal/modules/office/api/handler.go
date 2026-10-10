@@ -1,9 +1,11 @@
 package api
 
 import (
+	"backend/internal/infrastructure/mock"
 	"backend/internal/modules/office/application"
 	sharedApi "backend/internal/shared/api"
 	"context"
+	"net/http"
 )
 
 type FilePathInput struct {
@@ -18,36 +20,31 @@ func NewOfficeHandler(service *application.QueryOfficeService) *OfficeHandler {
 	return &OfficeHandler{service: service}
 }
 
-func (h *OfficeHandler) FileInfo(ctx context.Context, input *FilePathInput) (*sharedApi.Body[map[string]any], error) {
-	info := map[string]any{
-		"code": 0,
-		"data": map[string]any{
-			"id":          "jl_docx",
-			"name":        "jl.docx",
-			"version":     1,
-			"size":        118221,
-			"create_time": 1791532236,
-			"modify_time": 1791532236,
-			"creator_id":  "system",
-			"modifier_id": "system",
-		},
+func (h *OfficeHandler) FileInfo(_ context.Context, input *FilePathInput) (*sharedApi.Body2[mock.File], error) {
+	file, exists, err := mock.GetFile(input.FileID)
+	if err != nil {
+		return nil, err
 	}
-	return sharedApi.NewBody(info), nil
+	if !exists {
+		return nil, sharedApi.NewError(http.StatusNotFound, "文件不存在")
+	}
+
+	return sharedApi.NewBody2(file), nil
 }
 
-func (h *OfficeHandler) FileDownload(ctx context.Context, input *FilePathInput) (*sharedApi.Body[map[string]any], error) {
-
-	info := map[string]any{
-		"code": 0,
-		"data": map[string]any{
-			"url": "https://dsh-1300009960.cos.ap-beijing.myqcloud.com/office/jl.docx",
-		},
+func (h *OfficeHandler) FileDownload(_ context.Context, input *FilePathInput) (*sharedApi.Body2[map[string]string], error) {
+	file, exists, err := mock.GetFile(input.FileID)
+	if err != nil {
+		return nil, err
 	}
-	return sharedApi.NewBody(info), nil
+	if !exists {
+		return nil, sharedApi.NewError(http.StatusNotFound, "文件不存在")
+	}
+
+	return sharedApi.NewBody2(map[string]string{"url": file.URL}), nil
 }
 
 func (h *OfficeHandler) FilePermission(ctx context.Context, input *FilePathInput) (*sharedApi.Body[map[string]any], error) {
-
 	info := map[string]any{
 		"code": 0,
 		"data": map[string]any{
@@ -63,4 +60,13 @@ func (h *OfficeHandler) FilePermission(ctx context.Context, input *FilePathInput
 		},
 	}
 	return sharedApi.NewBody(info), nil
+}
+
+func (h *OfficeHandler) TestFileList(_ context.Context, _ *struct{}) (*sharedApi.Body2[[]mock.File], error) {
+	files, err := mock.GetFiles()
+	if err != nil {
+		return nil, err
+	}
+
+	return sharedApi.NewBody2(files), nil
 }
